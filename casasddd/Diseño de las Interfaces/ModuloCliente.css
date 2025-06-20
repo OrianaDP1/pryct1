@@ -1,0 +1,73 @@
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9fbfd;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Encabezado */
+header {
+  background-color: #0066cc;
+  color: white;
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+/* Navegación */
+.navbar {
+  display: flex;
+  background-color: #e9f1fb;
+  padding: 0.8rem 2rem;
+  justify-content: space-around;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar a {
+  color: #0066cc;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+
+.navbar a:hover {
+  background-color: #d0e7ff;
+}
+
+/* Contenido */
+.main-content {
+  padding: 2rem;
+}
+
+/* Tarjetas */
+.card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+/* Botones */
+.btn {
+  background-color: #0066cc;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 0.5rem;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background-color: #004a99;
+}
