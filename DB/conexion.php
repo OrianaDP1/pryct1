@@ -3,7 +3,7 @@
     $puerto = "5432";
     $db_nombre = "SVentaCDB";
     $usuario = "postgres";
-    $contraseña = "";
+    $contraseña = "123";
     $con = null;
 
     try {

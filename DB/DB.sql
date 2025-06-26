@@ -25,6 +25,8 @@ CREATE TABLE Usuario (
 	Imagen bytea --Imagen
 );
 
+ALTER TABLE Usuario ALTER COLUMN Contrasena TYPE VARCHAR(255);
+
 CREATE TABLE Clientes (
 	IDCliente SERIAL PRIMARY KEY,
 	Nombres VARCHAR(100),
