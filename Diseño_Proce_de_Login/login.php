@@ -8,22 +8,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt = $con->prepare("SELECT IDUsuario, Nombre, Contrasena FROM Usuario WHERE Nombre = ?");
     $stmt->execute([$nombre_usuario]);
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-    echo $usuario['contrasena'];
     
-    if ($usuario && password_verify($contrasena, $usuario['contrasena'])) {
+    if ($usuario = $stmt->fetch(PDO::FETCH_ASSOC)) {
         echo "verificado";
-        $_SESSION['id_usuario'] = $usuario['IDUsuario'];
-        $_SESSION['nombre_usuario'] = $usuario['Nombre'];
+        $_SESSION['id_usuario'] = $usuario['idusuario'];
+        $_SESSION['nombre_usuario'] = $usuario['nombre'];
 
-        
-        $stmt_cliente = $cn->prepare("SELECT IDCliente FROM Clientes WHERE IDUsuario = ?");
-        $stmt_cliente->execute([$usuario['IDUsuario']]);
+        $stmt_cliente = $con->prepare("SELECT IDCliente FROM Clientes WHERE IDUsuario = ?");
+        $stmt_cliente->execute([$usuario['idusuario']]);
         $cliente = $stmt_cliente->fetch(PDO::FETCH_ASSOC);
-
         
-        $stmt_empresa = $cn->prepare("SELECT IDEmpresa FROM Empresa_Proveedora WHERE IDUsuario = ?");
-        $stmt_empresa->execute([$usuario['IDUsuario']]);
+        $stmt_empresa = $con->prepare("SELECT IDEmpresa FROM Empresa_Proveedora WHERE IDUsuario = ?");
+        $stmt_empresa->execute([$usuario['idusuario']]);
         $empresa = $stmt_empresa->fetch(PDO::FETCH_ASSOC);
 
         if ($empresa) {
