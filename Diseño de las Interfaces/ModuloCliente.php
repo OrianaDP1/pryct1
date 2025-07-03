@@ -40,26 +40,12 @@ if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_usuario'])) {
 <main class="container mt-4">
 
   <h2>Buscar Productos</h2>
-  <form method="get" class="mb-4">
+  <form method="get" action="../Procedimientos/catalogo_producto.php" class="mb-4">
     <div class="input-group">
       <input type="text" name="buscar" class="form-control" placeholder="Buscar por Nombre o Descripción..." value="<?= htmlspecialchars($_GET['buscar'] ?? '') ?>">
       <button class="btn btn-primary" type="submit">Buscar</button>
     </div>
   </form>
-  <?php if (!empty($productos)): ?>
-    <h3>Resultados:</h3>
-    <ul class="list-group mb-4">
-      <?php foreach ($productos as $producto): ?>
-        <li class="list-group-item">
-          <?php foreach ($producto as $clave => $valor): ?>
-            <strong><?= htmlspecialchars($clave) ?>:</strong> <?= htmlspecialchars($valor) ?><br>
-          <?php endforeach; ?>
-        </li>
-      <?php endforeach; ?>
-    </ul>
-  <?php elseif (isset($_GET['buscar'])): ?>
-    <div class="alert alert-warning">No se encontraron productos con ese término.</div>
-  <?php endif; ?>
 
   <h2 class="mb-4">Productos Destacados</h2>
 
