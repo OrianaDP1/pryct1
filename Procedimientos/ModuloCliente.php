@@ -6,7 +6,7 @@
     $busqueda = trim($_GET['buscar']);
     if ($busqueda !== '') {
       $like = "%$busqueda%";
-      $stmt = $con->prepare("SELECT Nombre, Descripcion, Precio, StockActual, Color, Estado, FechaPublicacion FROM Productos WHERE Nombre ILIKE :buscar");
+      $stmt = $con->prepare("SELECT Nombre, Precio FROM Productos WHERE Nombre ILIKE :buscar");
       $stmt->execute(['buscar' => $like]);
       $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
