@@ -22,7 +22,8 @@ CREATE TABLE Usuario (
 	Correo VARCHAR(120),
 	Telefono VARCHAR(12),
 	Direccion VARCHAR(100),
-	Imagen bytea --Imagen
+	Imagen bytea, --Imagen
+	tipo_mime VARCHAR(100)
 );
 
 ALTER TABLE Usuario ALTER COLUMN Contrasena TYPE VARCHAR(255);
@@ -46,7 +47,8 @@ CREATE TABLE Empresa_Proveedora (
 CREATE TABLE Marcas(
 	IDMarca SERIAL PRIMARY KEY,
 	Nombre VARCHAR(50),
-	Imagen bytea --Imagen
+	Imagen bytea,
+	tipo_mime VARCHAR(100)--Imagen
 );
 CREATE TABLE Categoria(
 	IDCategoria SERIAL PRIMARY KEY,
@@ -63,6 +65,7 @@ CREATE TABLE Productos (
 	StockActual INT,
 	Color VARCHAR(6), -- Código HEX
 	Imagen BYTEA,
+	tipo_mime VARCHAR(100),
 	IDCategoria INT,
 	IDMarca INT,
 	IDEmpresa INT,
