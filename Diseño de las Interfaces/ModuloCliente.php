@@ -36,7 +36,7 @@
 <main class="container mt-4">
 
   <h2>Buscar Productos</h2>
-  <form method="get" class="mb-4">
+  <form method="get" action="../Procedimientos/catalogo_producto.php" class="mb-4">
     <div class="input-group">
       <input type="text" name="buscar" class="form-control" placeholder="Buscar por Nombre o Descripción..." value="<?= htmlspecialchars($_GET['buscar'] ?? '') ?>">
       <button class="btn btn-primary" type="submit">Buscar</button>
