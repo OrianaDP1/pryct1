@@ -1,7 +1,11 @@
 <?php
-  session_start();
-  include '../DB/conexion.php'; 
-  require_once('../Procedimientos/ModuloCliente.php');
+session_start();
+include '../DB/conexion.php';
+
+if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_usuario'])) {
+    header("Location: ../Diseño_Proce_de_Login/login.html");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,7 +30,7 @@
           <li class="nav-item"><a class="nav-link text-white" href="#">Productos</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="#">Mi Cuenta</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="#">Carrito</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="#">Cerrar sesión</a></li>
+          <li class="nav-item"><a class="nav-link text-white" href="logout.php">Cerrar sesión</a></li>
         </ul>
       </nav>
     </div>
@@ -42,7 +46,6 @@
       <button class="btn btn-primary" type="submit">Buscar</button>
     </div>
   </form>
-
   <?php if (!empty($productos)): ?>
     <h3>Resultados:</h3>
     <ul class="list-group mb-4">
@@ -60,22 +63,22 @@
 
   <h2 class="mb-4">Productos Destacados</h2>
 
+
   <?php
     $stmt = $con->prepare("SELECT idproducto, nombre, precio FROM Productos");
     $stmt->execute();
-    $destacados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
   ?>
-
   <div class="row row-cols-1 row-cols-md-3 g-4">
-    <?php foreach ($destacados as $prod): ?>
+    <?php foreach ($productos as $prod): ?>
       <div class="col">
         <div class="card h-100 product-card shadow-sm">
-          <img src="../imagenes/celular_generico.jpg" class="card-img-top" alt="Imagen del celular">
+          <img src="../Procedimientos/mostrar_imagen.php?idproducto=<?= (int)$prod['idproducto'] ?>" alt="Imagen <?= htmlspecialchars($prod['nombre']) ?>" class="product-img" />
           <div class="card-body">
-            <h5 class="card-title"><?= htmlspecialchars($prod['nombre']) ?></h5>
-            <p class="card-text"><strong>Precio:</strong> $<?= htmlspecialchars($prod['precio']) ?></p>
+            <h5 class="card-title"><?php echo htmlspecialchars($prod['nombre']); ?></h5>
+            <p class="card-text"><strong>Precio:</strong> $<?php echo htmlspecialchars($prod['precio']); ?></p>
             <form method="POST" action="../Diseno_Proce_de_PaGeneProductos/productos.php">
-              <input type="hidden" name="idproducto" value="<?= $prod['idproducto'] ?>">
+              <input type="hidden" name="idproducto" value="<?php echo $prod['idproducto']; ?>">
               <button type="submit" class="btn btn-primary w-100">Ver Detalles</button>
             </form>
           </div>
@@ -93,4 +96,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-<?php session_destroy(); ?>
