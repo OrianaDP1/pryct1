@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($cliente) {
             $_SESSION['tipo_usuario'] = 'cliente';
             echo "2";
-            header('location: ../Procedimientos/ModuloCliente.php'); 
+            header('location: ../Diseño de las Interfaces/ModuloCliente.php'); 
         } else {
             $_SESSION['tipo_usuario'] = 'desconocido';
             echo "3";
