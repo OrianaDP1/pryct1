@@ -26,7 +26,7 @@
           <li class="nav-item"><a class="nav-link text-white" href="#">Clientes</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="#">Reportes</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="#">Configuración</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="#">Cerrar sesión</a></li>
+          <li class="nav-item"><a class="nav-link text-white" href="../Diseno_P_de_Logout/logout.php">Cerrar sesión</a></li>
         </ul>
       </nav>
 

@@ -30,7 +30,7 @@ if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_usuario'])) {
           <li class="nav-item"><a class="nav-link text-white" href="#">Productos</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="#">Mi Cuenta</a></li>
           <li class="nav-item"><a class="nav-link text-white" href="#">Carrito</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="logout.php">Cerrar sesión</a></li>
+          <li class="nav-item"><a class="nav-link text-white" href="../Diseno_P_de_Logout/logout.php">Cerrar sesión</a></li>
         </ul>
       </nav>
     </div>
