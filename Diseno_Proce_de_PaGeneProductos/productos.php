@@ -34,42 +34,19 @@ unset($_SESSION['success'], $_SESSION['error']);
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Compra de Celulares - ABD</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <style>
-    body {
-      background: #f8f9fa;
-    }
-    .product-img {
-      max-width: 100%;
-      max-height: 400px;
-      object-fit: contain;
-      border-radius: 0.5rem;
-      background: white;
-      padding: 1rem;
-      box-shadow: 0 0 10px rgb(0 0 0 / 0.1);
-    }
-    .product-detail {
-      background: white;
-      padding: 2rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 0 12px rgb(0 0 0 / 0.1);
-    }
-    .product-list {
-      margin-top: 3rem;
-    }
-  </style>
+  <link rel="stylesheet" href="productos.css">
 </head>
 <body>
-
-<header class="bg-dark text-white p-3 mb-4">
-  <div class="container d-flex justify-content-between align-items-center flex-wrap">
-    <h1 class="h3 mb-0">Bienvenido, <?= htmlspecialchars($_SESSION['nombre_usuario']) ?></h1>
+<header class="bg-dark text-white p-4">
+  <div class="container d-flex justify-content-between align-items-center">
+    <h1 class="h3 mb-0">Bienvenido, Cliente</h1>
     <nav>
       <ul class="nav">
-        <li class="nav-item"><a class="nav-link text-white" href="ModuloCliente.php">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link text-white" href="#">Productos</a></li>
-        <li class="nav-item"><a class="nav-link text-white" href="#">Mi Cuenta</a></li>
-        <li class="nav-item"><a class="nav-link text-white" href="#">Carrito</a></li>
-        <li class="nav-item"><a class="nav-link text-white" href="../Diseño_Proce_de_Login/logout.php">Cerrar sesión</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseño de las Interfaces/ModuloCliente.php">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseno_de_Productos_Cliente/ProductosCliente.php">Compras</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseno_de_mi_cuenta/Cuenta_Cliente.php">Mi Cuenta</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseno_P_Carrito/carrito.php">Carrito</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseno_P_de_Logout/logout.php">Cerrar sesión</a></li>
       </ul>
     </nav>
   </div>

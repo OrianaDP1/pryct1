@@ -1,35 +1,85 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="login.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
+<script>
+  fetch('login_check.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.loggedIn) {
+        if(data.tipo === 'cliente') {
+          window.location.href = '../Diseño de las Interfaces/ModuloCliente.php';
+        } else if(data.tipo === 'proveedor') {
+          window.location.href = '../Diseño de las Interfaces/ModuloEmpresa.php';
+        } else {
+          window.location.href = 'perfil.php'; 
+        }
+      }
+
+    })
+    .catch(error => console.error('Error en login_check:', error));
+</script>
 <body>
-
-    <div class="container d-flex justify-content-center align-items-center vh-100">
-        <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
-            <h2 class="text-center mb-4">Iniciar Sesión</h2>
-            <form method="POST" action="login.php">
-                <div class="mb-3">
-                    <label for="usuario" class="form-label">Usuario</label>
-                    <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Ingresa tu usuario" required>
-                </div>
-                <div class="mb-3">
-                    <label for="contrasena" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Ingresa tu contraseña" required>
-                </div>
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </div>
-            </form>
-        </div>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
+        <h2 class="text-center mb-4">Iniciar Sesión</h2>
+        <form id="loginForm">
+            <div class="mb-3">
+                <label for="usuario" class="form-label">Usuario</label>
+                <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Ingresa tu usuario" required />
+            </div>
+            <div class="mb-3">
+                <label for="contrasena" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Ingresa tu contraseña" required />
+            </div>
+            <div id="mensaje" class="mb-3 text-danger"></div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Entrar</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const usuario = document.getElementById('usuario').value.trim();
+    const contrasena = document.getElementById('contrasena').value.trim();
+    const mensaje = document.getElementById('mensaje');
+    mensaje.textContent = '';
+
+    if (!usuario || !contrasena) {
+        mensaje.textContent = 'Por favor ingresa usuario y contraseña.';
+        return;
+    }
+
+    try {
+        const response = await fetch('login.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usuario, contrasena })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Redirigir según tipo de usuario (devuelto por login.php)
+            window.location.href = data.redirect;
+        } else {
+            mensaje.textContent = data.error || 'Error desconocido';
+        }
+
+    } catch (error) {
+        mensaje.textContent = 'Error en la conexión, intenta de nuevo.';
+        console.error(error);
+    }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

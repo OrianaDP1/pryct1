@@ -20,20 +20,19 @@ if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_usuario'])) {
 </head>
 <body>
 
+
 <header class="bg-dark text-white p-4">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-      <h1 class="h3 mb-0">Bienvenido, Cliente</h1>
-      <nav>
-        <ul class="nav">
-          <li class="nav-item"><a class="nav-link text-white" href="#">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="#">Productos</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="#">Mi Cuenta</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="#">Carrito</a></li>
-          <li class="nav-item"><a class="nav-link text-white" href="../Diseno_P_de_Logout/logout.php">Cerrar sesión</a></li>
-        </ul>
-      </nav>
-    </div>
+  <div class="container d-flex justify-content-between align-items-center">
+    <h1 class="h3 mb-0">Bienvenido, Cliente</h1>
+    <nav>
+      <ul class="nav">
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseño de las Interfaces/ModuloCliente.php">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseno_de_Productos_Cliente/ProductosCliente.php">Compras</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseno_de_mi_cuenta/Cuenta_Cliente.php">Mi Cuenta</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseno_P_Carrito/carrito.php">Carrito</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="../Diseno_P_de_Logout/logout.php">Cerrar sesión</a></li>
+      </ul>
+    </nav>
   </div>
 </header>
 
