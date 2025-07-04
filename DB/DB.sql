@@ -26,8 +26,6 @@ CREATE TABLE Usuario (
 	tipo_mime VARCHAR(100)
 );
 
-ALTER TABLE Usuario ALTER COLUMN Contrasena TYPE VARCHAR(255);
-
 CREATE TABLE Clientes (
 	IDCliente SERIAL PRIMARY KEY,
 	Nombres VARCHAR(100),
