@@ -54,7 +54,7 @@ $empresa = $stmt_empresa->fetch(PDO::FETCH_ASSOC);
 
 if ($empresa) {
     $_SESSION['tipo_usuario'] = 'proveedor';
-    echo json_encode(['success' => true, 'redirect' => '../Diseño de las Interfaces/ModuloAdministrador.php']);
+    echo json_encode(['success' => true, 'redirect' => '../Diseño de las Interfaces/ModuloEmpresa.php']);
     exit;
 } elseif ($cliente) {
     $_SESSION['tipo_usuario'] = 'cliente';
@@ -62,6 +62,6 @@ if ($empresa) {
     exit;
 } else {
     $_SESSION['tipo_usuario'] = 'desconocido';
-    echo json_encode(['success' => true, 'redirect' => 'perfil.php']);
+    echo json_encode(['success' => true, 'redirect' => '../Diseño de las Interfaces/ModuloAdministrador.php']);
     exit;
 }
