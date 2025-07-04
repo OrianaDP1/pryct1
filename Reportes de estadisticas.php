@@ -2,7 +2,7 @@
 include_once '../DB/conexion.php';
 
 try {
-    // Consultas
+    // Consultas SQL
     $sql1 = "
         SELECT cat.nombre AS categoria, COUNT(v.idventa) AS total_vendidos
         FROM ventas v
@@ -79,16 +79,61 @@ try {
     <meta charset="UTF-8">
     <title>Reporte Estadístico</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .card {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #343a40;
+            color: #fff;
+        }
+        .table td {
+            color: #000;
+        }
+        .card-header {
+            background-color: #212529;
+            color: white;
+        }
+        a.nav-link {
+            color: white !important;
+        }
+        .text-success {
+            color: #198754 !important;
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container py-5">
+<!-- Header negro con navegación -->
+<header class="bg-dark text-white p-4 mb-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">Bienvenido Administrador</h1>
+            <nav>
+                <ul class="nav">
+                    <li class="nav-item"><a class="nav-link text-white" href="../Diseño de las Interfaces/ModuloAdministrador.php">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#">Mi Cuenta</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="#">Carrito</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="../Diseno_P_de_Logout/logout.php">Cerrar sesión</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<div class="container">
     <h1 class="mb-4 text-center">📊 Reporte Estadístico General</h1>
 
     <div class="row mb-5">
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
                     <strong>1. Productos Vendidos por Categoría</strong>
                 </div>
                 <div class="card-body">
@@ -159,9 +204,9 @@ try {
             </div>
         </div>
     </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
