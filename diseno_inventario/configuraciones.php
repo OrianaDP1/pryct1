@@ -25,14 +25,25 @@ if (!$empresa) {
 
 $mensaje = '';
 $error = '';
-$logoPath = ''; // Variable para manejar la ruta del logo si decides guardarlo en sistema de archivos
+$logoExtensions = ['png', 'jpg', 'jpeg', 'gif'];
+$logoExists = false;
+$logoUrl = '';
+$defaultLogoPath = '../uploads/logos/logo_' . $empresa['idempresa'] . '.';
 
-// Procesar actualización de datos
+// Buscar logo actual
+foreach ($logoExtensions as $ext) {
+    if (file_exists($defaultLogoPath . $ext)) {
+        $logoUrl = $defaultLogoPath . $ext . '?v=' . time(); // Cache busting
+        $logoExists = true;
+        break;
+    }
+}
+
+// Procesar actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $con->beginTransaction();
 
-        // Validar y sanitizar datos
         $nombre = trim($_POST['nombre'] ?? '');
         $ruc = trim($_POST['ruc'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -41,48 +52,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Nombre y RUC son campos obligatorios.");
         }
 
-        // Actualizar datos de la empresa (solo RUC y Nombre según la estructura)
         $stmtUpdateEmpresa = $con->prepare("UPDATE Empresa_Proveedora 
-                                          SET Nombre = ?, RUC = ?
-                                          WHERE IDEmpresa = ?");
-        $stmtUpdateEmpresa->execute([
-            $nombre,
-            $ruc,
-            $empresa['IDEmpresa']
-        ]);
+                                            SET Nombre = ?, RUC = ?
+                                            WHERE IDEmpresa = ?");
+        $stmtUpdateEmpresa->execute([$nombre, $ruc, $empresa['idempresa']]);
 
-        // Actualizar email del usuario
         if (!empty($email)) {
             $stmtUpdateUsuario = $con->prepare("UPDATE Usuario SET Correo = ? WHERE IDUsuario = ?");
             $stmtUpdateUsuario->execute([$email, $idUsuario]);
         }
 
-        // Manejo de imagen de logo (OPCIONAL - guardar en sistema de archivos)
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = '../uploads/logos/';
             if (!file_exists($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
-            
-            $extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
-            $filename = 'logo_' . $empresa['IDEmpresa'] . '.' . $extension;
+
+            foreach ($logoExtensions as $ext) {
+                if (file_exists($defaultLogoPath . $ext)) {
+                    unlink($defaultLogoPath . $ext);
+                }
+            }
+
+            $extension = strtolower(pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION));
+            if (!in_array($extension, $logoExtensions)) {
+                throw new Exception("Formato de imagen no permitido.");
+            }
+
+            $filename = 'logo_' . $empresa['idempresa'] . '.' . $extension;
             $destination = $uploadDir . $filename;
-            
+
             if (move_uploaded_file($_FILES['logo']['tmp_name'], $destination)) {
-                $logoPath = $destination;
-                // Aquí podrías guardar $filename en la BD si añadieras un campo para ello
+                $logoUrl = $destination . '?v=' . time();
+                $logoExists = true;
             }
         }
 
         $con->commit();
         $mensaje = "Configuración actualizada correctamente.";
-        
-        // Actualizar datos en variable de sesión
-        $_SESSION['nombre_usuario'] = $nombreUsuario;
-        
-        // Recargar datos de la empresa
+
+        // Recargar empresa
+        $stmtEmpresa = $con->prepare("SELECT e.*, u.Correo as email_usuario 
+                                     FROM Empresa_Proveedora e
+                                     JOIN Usuario u ON e.IDUsuario = u.IDUsuario
+                                     WHERE e.IDUsuario = ?");
         $stmtEmpresa->execute([$idUsuario]);
         $empresa = $stmtEmpresa->fetch(PDO::FETCH_ASSOC);
+
+        // Verificar logo
+        foreach ($logoExtensions as $ext) {
+            if (file_exists($defaultLogoPath . $ext)) {
+                $logoUrl = $defaultLogoPath . $ext . '?v=' . time();
+                $logoExists = true;
+                break;
+            }
+        }
 
     } catch (PDOException $e) {
         $con->rollBack();
@@ -92,150 +116,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = $e->getMessage();
     }
 }
-
-// Verificar si existe un logo guardado en sistema de archivos
-$defaultLogoPath = '../uploads/logos/logo_' . $empresa['idempresa'] . '.';
-$logoExtensions = ['png', 'jpg', 'jpeg', 'gif'];
-$logoExists = false;
-$logoUrl = '';
-
-foreach ($logoExtensions as $ext) {
-    if (file_exists($defaultLogoPath . $ext)) {
-        $logoUrl = $defaultLogoPath . $ext;
-        $logoExists = true;
-        break;
-    }
-}
 ?>
 
+<!-- HTML -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuración de Empresa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .config-container {
-            max-width: 800px;
-            margin: 30px auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            padding: 30px;
-        }
-        .logo-preview {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 5px;
-            background-color: #f8f9fa;
-        }
-        .form-label {
-            font-weight: 500;
-        }
-        .btn-submit {
-            background-color: #6c63ff;
-            border: none;
-            padding: 10px 25px;
-            font-weight: 500;
-        }
-        .btn-submit:hover {
-            background-color: #5a52d5;
-        }
-    </style>
 </head>
-<body>
-    <div class="container py-4">
-        <div class="config-container">
-            <h2 class="mb-4"><i class="fas fa-cog me-2"></i>Configuración de la Empresa</h2>
-            
-            <?php if ($mensaje): ?>
-                <div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div>
-            <?php endif; ?>
-            
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
+<body class="bg-light">
+<div class="container mt-5">
+    <h2 class="mb-4">Configuración de Empresa</h2>
 
-            <form method="POST" enctype="multipart/form-data">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre de la Empresa</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" 
-                                   value="<?= htmlspecialchars($empresa['Nombre'] ?? '') ?>" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="ruc" class="form-label">RUC</label>
-                            <input type="text" class="form-control" id="ruc" name="ruc" 
-                                   value="<?= htmlspecialchars($empresa['RUC'] ?? '') ?>" required>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email de Contacto</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   value="<?= htmlspecialchars($empresa['email_usuario'] ?? '') ?>">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="logo" class="form-label">Logo de la Empresa</label>
-                            <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row mb-4">
-                    <div class="col-md-12 text-center">
-                        <?php if ($logoExists): ?>
-                            <img src="<?= htmlspecialchars($logoUrl) ?>" class="logo-preview mb-3" id="logoPreview">
-                        <?php else: ?>
-                            <div class="logo-preview mb-3 d-flex align-items-center justify-content-center" id="logoPreview">
-                                <i class="fas fa-building text-muted" style="font-size: 3rem;"></i>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                
-                <div class="text-end">
-                    <button type="submit" class="btn btn-submit text-white">
-                        <i class="fas fa-save me-1"></i> Guardar Cambios
-                    </button>
-                </div>
-            </form>
+    <?php if ($mensaje): ?>
+        <div class="alert alert-success"><?= htmlspecialchars($mensaje) ?></div>
+    <?php endif; ?>
+
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
+    <!-- Formulario -->
+    <form method="POST" enctype="multipart/form-data" class="border p-4 bg-white rounded shadow-sm mb-4">
+        <div class="mb-3">
+            <label class="form-label">Nombre de Empresa</label>
+            <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($empresa['nombre']) ?>" required>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Vista previa del logo seleccionado
-        document.getElementById('logo').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const preview = document.getElementById('logoPreview');
-                    preview.innerHTML = '';
-                    const img = document.createElement('img');
-                    img.src = event.target.result;
-                    img.className = 'logo-preview';
-                    img.style.maxWidth = '100%';
-                    img.style.maxHeight = '100%';
-                    preview.appendChild(img);
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
+        <div class="mb-3">
+            <label class="form-label">RUC</label>
+            <input type="text" name="ruc" class="form-control" value="<?= htmlspecialchars($empresa['ruc']) ?>" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Correo Electrónico</label>
+            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($empresa['email_usuario']) ?>">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Logo de la Empresa</label><br>
+            <?php if ($logoExists): ?>
+                <img src="<?= $logoUrl ?>" alt="Logo actual" class="mb-2" style="max-height: 100px;"><br>
+            <?php endif; ?>
+            <input type="file" name="logo" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </form>
+
+    <!-- Reporte tipo tabla -->
+    <h4 class="mb-3">Resumen de Empresa</h4>
+    <table class="table table-bordered table-striped bg-white shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID Empresa</th>
+                <th>RUC</th>
+                <th>Nombre</th>
+                <th>ID Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><?= htmlspecialchars($empresa['idempresa']) ?></td>
+                <td><?= htmlspecialchars($empresa['ruc']) ?></td>
+                <td><?= htmlspecialchars($empresa['nombre']) ?></td>
+                <td><?= htmlspecialchars($empresa['idusuario']) ?></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>
