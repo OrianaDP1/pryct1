@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../DB/conexion.php';
+include __DIR__ . '/../DB/conexion.php';
 
 if (!isset($_SESSION['id_usuario']) || !isset($_SESSION['nombre_usuario'])) {
     header("Location: ../Diseño_Proce_de_Login/login.html");
