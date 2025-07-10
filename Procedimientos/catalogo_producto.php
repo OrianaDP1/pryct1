@@ -50,7 +50,7 @@ include '../DB/conexion.php';
                     <div class="card-body">
                     <h5 class="card-title"><?= htmlspecialchars($prod['nombre']) ?></h5>
                     <p class="card-text"><strong>Precio:</strong> $<?= htmlspecialchars($prod['precio']) ?></p>
-                    <form method="POST" action="../Diseno_Proce_de_PaGeneProductos/productos.php">
+                    <form method="GET" action="../Diseno_Proce_de_PaGeneProductos/productos.php">
                         <input type="hidden" name="idproducto" value="<?= $prod['idproducto'] ?>">
                         <button type="submit" class="btn btn-primary w-100">Ver Detalles</button>
                     </form>

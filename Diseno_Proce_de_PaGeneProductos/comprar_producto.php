@@ -8,43 +8,39 @@ if (!isset($_SESSION['id_usuario'])) {
 }
 
 $idUsuario = $_SESSION['id_usuario'];
-echo $idUsuario;
-// ✔️ CONSULTAR el IDCliente real usando el IDUsuario
-$stmtCliente = $con->prepare("SELECT IDCliente FROM Clientes WHERE idusuario = :idusuario");
+
+$stmtCliente = $con->prepare("SELECT idcliente FROM clientes WHERE idusuario = :idusuario");
 $stmtCliente->bindParam(':idusuario', $idUsuario, PDO::PARAM_INT);
 $stmtCliente->execute();
 $cliente = $stmtCliente->fetch(PDO::FETCH_ASSOC);
 
 if (!$cliente) {
     $_SESSION['error'] = "Cliente no encontrado.";
+    header("Location: ../Diseño de las Interfaces/ModuloCliente.php");
     exit();
 }
 
-$idcliente = $cliente ['idcliente'];
+$idcliente = $cliente['idcliente'];
 
-// Recibir datos del formulario
-$idproducto = filter_input(INPUT_POST, 'idproducto', FILTER_VALIDATE_INT);
-$cantidad = filter_input(INPUT_POST, 'cantidad', FILTER_VALIDATE_INT);
+$idproducto = null;
+$cantidad = null;
 
 if (isset($_SESSION['pago_autorizado'], $_SESSION['compra_pendiente']) && $_SESSION['pago_autorizado'] === true) {
     $idproducto = $_SESSION['compra_pendiente']['idproducto'];
     $cantidad = $_SESSION['compra_pendiente']['cantidad'];
-    // Limpiar flags antes de continuar
     unset($_SESSION['pago_autorizado'], $_SESSION['compra_pendiente']);
 } else {
-    // Fallback al método tradicional vía POST (compra directa sin pago)
     $idproducto = filter_input(INPUT_POST, 'idproducto', FILTER_VALIDATE_INT);
     $cantidad = filter_input(INPUT_POST, 'cantidad', FILTER_VALIDATE_INT);
 }
 
 if (!$idproducto || !$cantidad || $cantidad < 1) {
-    $_SESSION['error'] = "Datos inválidos para la compra.";
+    $_SESSION['error'] = "Datos inválidos para la compra. Producto: " . htmlspecialchars($idproducto) . ", Cantidad: " . htmlspecialchars($cantidad);
     header("Location: ../Diseño de las Interfaces/ModuloCliente.php");
     exit();
 }
 
-// Consultar producto y stock
-$stmtProd = $con->prepare("SELECT Precio, StockActual FROM Productos WHERE IDProducto = :idproducto AND Estado = B'1'");
+$stmtProd = $con->prepare("SELECT precio, stockactual FROM productos WHERE idproducto = :idproducto AND estado = B'1'");
 $stmtProd->bindParam(':idproducto', $idproducto, PDO::PARAM_INT);
 $stmtProd->execute();
 $producto = $stmtProd->fetch(PDO::FETCH_ASSOC);
@@ -64,9 +60,8 @@ if ($producto['stockactual'] < $cantidad) {
 try {
     $con->beginTransaction();
 
-    // Insertar en Ventas
     $stmtVenta = $con->prepare("
-        INSERT INTO Ventas (Cantidad, Precio_Unitario, Descuento, IDProducto, IDCliente)
+        INSERT INTO ventas (cantidad, precio_unitario, descuento, idproducto, idcliente)
         VALUES (:cantidad, :precio_unit, :descuento, :idproducto, :idcliente)
     ");
     $stmtVenta->execute([
@@ -80,7 +75,7 @@ try {
     $idVenta = $con->lastInsertId();
 
     $stmtDetalle = $con->prepare("
-        INSERT INTO Detalle_Ventas (Estado_Venta, Metodo_Pago, Estado_de_Envio, IDVenta)
+        INSERT INTO detalle_ventas (estado_venta, metodo_pago, estado_de_envio, idventa)
         VALUES (:estado, :metodo, :envio, :idventa)
     ");
     $stmtDetalle->execute([
@@ -90,10 +85,9 @@ try {
         ':idventa' => $idVenta
     ]);
 
-    // Actualizar stock
     $stmtUpdate = $con->prepare("
-        UPDATE Productos SET StockActual = StockActual - :cantidad
-        WHERE IDProducto = :idproducto
+        UPDATE productos SET stockactual = stockactual - :cantidad
+        WHERE idproducto = :idproducto
     ");
     $stmtUpdate->execute([
         ':cantidad' => $cantidad,

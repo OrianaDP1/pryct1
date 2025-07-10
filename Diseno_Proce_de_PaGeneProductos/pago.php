@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $exito = null;
 $mensaje = null;
 
@@ -10,18 +12,28 @@ function validar_fecha_vencimiento($fecha_vencimiento) {
     $fecha_actual = date('Y-m');
     return strtotime($fecha_vencimiento) > strtotime($fecha_actual);
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $numero_tarjeta = $_POST['numero_tarjeta'];
-    $fecha_vencimiento = $_POST['fecha_vencimiento'];
-    $cvv = $_POST['cvv'];
 
-    if (validar_tarjeta($numero_tarjeta) && validar_fecha_vencimiento($fecha_vencimiento) && is_numeric($cvv) && strlen($cvv) === 3) {
-        $_SESSION['pago_autorizado'] = true; // ✅ Flag de que el pago fue válido
-        header("Location: comprar_producto.php");
-        exit;
-    } else {
-        $exito = false;
-        $mensaje = "Error: Por favor, verifica los datos de la tarjeta.";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['idproducto'], $_POST['cantidad'])) {
+        $_SESSION['compra_pendiente'] = [
+            'idproducto' => (int)$_POST['idproducto'],
+            'cantidad' => (int)$_POST['cantidad']
+        ];
+    }
+
+    if (isset($_POST['numero_tarjeta'], $_POST['fecha_vencimiento'], $_POST['cvv'])) {
+        $numero_tarjeta = $_POST['numero_tarjeta'];
+        $fecha_vencimiento = $_POST['fecha_vencimiento'];
+        $cvv = $_POST['cvv'];
+
+        if (validar_tarjeta($numero_tarjeta) && validar_fecha_vencimiento($fecha_vencimiento) && is_numeric($cvv) && strlen($cvv) === 3) {
+            $_SESSION['pago_autorizado'] = true; 
+            header("Location: comprar_producto.php");
+            exit;
+        } else {
+            $exito = false;
+            $mensaje = "Error: Por favor, verifica los datos de la tarjeta.";
+        }
     }
 }
 ?>
