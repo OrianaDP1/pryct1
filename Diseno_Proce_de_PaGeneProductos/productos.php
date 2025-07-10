@@ -99,7 +99,7 @@ unset($_SESSION['success'], $_SESSION['error']);
         <p><?= nl2br(htmlspecialchars($destacado['descripcion'])) ?></p>
 
         
-        <form method="post" action="comprar_producto.php" class="mt-4">
+        <form method="post" action="pagointermedio.php" class="mt-4">
           <input type="hidden" name="idproducto" value="<?= (int)$destacado['idproducto'] ?>">
           <label for="cantidad" class="form-label">Cantidad:</label>
           <input
