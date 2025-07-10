@@ -1,6 +1,6 @@
 -- Usuario
 INSERT INTO Usuario (Nombre, Contrasena, Correo, Telefono, Direccion, Imagen)
-VALUES ('Juan Perez', '12345', 'juan@example.com', '987654321', 'Av. Siempre Viva 123', NULL);
+VALUES ('Juan Perez', '$2y$10$eFqVPfrSvjR0jSIQBqFn6OdV7xsoA/i0DIFpYoXtqG3WCHyhbIaLu', 'juan@example.com', '987654321', 'Av. Siempre Viva 123', NULL);
 
 -- Clientes
 INSERT INTO Clientes (Nombres, Apellidos, IDUsuario)
