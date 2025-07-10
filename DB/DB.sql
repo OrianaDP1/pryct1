@@ -18,7 +18,7 @@
 CREATE TABLE Usuario (
 	IDUsuario SERIAL PRIMARY KEY,
 	Nombre VARCHAR(90),
-	Contrasena VARCHAR(50),
+	Contrasena VARCHAR(255),
 	Correo VARCHAR(120),
 	Telefono VARCHAR(12),
 	Direccion VARCHAR(100),
