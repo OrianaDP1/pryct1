@@ -25,6 +25,7 @@ if (!$empresa) {
 
 $mensaje = '';
 $error = '';
+$logoPath = ''; // Variable para manejar la ruta del logo si decides guardarlo en sistema de archivos
 
 // Procesar actualización de datos
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -34,23 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validar y sanitizar datos
         $nombre = trim($_POST['nombre'] ?? '');
         $ruc = trim($_POST['ruc'] ?? '');
-        $direccion = trim($_POST['direccion'] ?? '');
-        $telefono = trim($_POST['telefono'] ?? '');
         $email = trim($_POST['email'] ?? '');
 
         if (empty($nombre) || empty($ruc)) {
             throw new Exception("Nombre y RUC son campos obligatorios.");
         }
 
-        // Actualizar datos de la empresa
+        // Actualizar datos de la empresa (solo RUC y Nombre según la estructura)
         $stmtUpdateEmpresa = $con->prepare("UPDATE Empresa_Proveedora 
-                                          SET Nombre = ?, RUC = ?, Direccion = ?, Telefono = ?
+                                          SET Nombre = ?, RUC = ?
                                           WHERE IDEmpresa = ?");
         $stmtUpdateEmpresa->execute([
             $nombre,
             $ruc,
-            $direccion,
-            $telefono,
             $empresa['IDEmpresa']
         ]);
 
@@ -60,15 +57,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmtUpdateUsuario->execute([$email, $idUsuario]);
         }
 
-        // Manejo de imagen de logo
+        // Manejo de imagen de logo (OPCIONAL - guardar en sistema de archivos)
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $logo = file_get_contents($_FILES['logo']['tmp_name']);
-            $tipo_mime = $_FILES['logo']['type'];
+            $uploadDir = '../uploads/logos/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
             
-            $stmtUpdateLogo = $con->prepare("UPDATE Empresa_Proveedora 
-                                            SET Logo = ?, TipoMimeLogo = ?
-                                            WHERE IDEmpresa = ?");
-            $stmtUpdateLogo->execute([$logo, $tipo_mime, $empresa['IDEmpresa']]);
+            $extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+            $filename = 'logo_' . $empresa['IDEmpresa'] . '.' . $extension;
+            $destination = $uploadDir . $filename;
+            
+            if (move_uploaded_file($_FILES['logo']['tmp_name'], $destination)) {
+                $logoPath = $destination;
+                // Aquí podrías guardar $filename en la BD si añadieras un campo para ello
+            }
         }
 
         $con->commit();
@@ -87,6 +90,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $con->rollBack();
         $error = $e->getMessage();
+    }
+}
+
+// Verificar si existe un logo guardado en sistema de archivos
+$defaultLogoPath = '../uploads/logos/logo_' . $empresa['idempresa'] . '.';
+$logoExtensions = ['png', 'jpg', 'jpeg', 'gif'];
+$logoExists = false;
+$logoUrl = '';
+
+foreach ($logoExtensions as $ext) {
+    if (file_exists($defaultLogoPath . $ext)) {
+        $logoUrl = $defaultLogoPath . $ext;
+        $logoExists = true;
+        break;
     }
 }
 ?>
@@ -162,21 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="text" class="form-control" id="ruc" name="ruc" 
                                    value="<?= htmlspecialchars($empresa['RUC'] ?? '') ?>" required>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="direccion" class="form-label">Dirección</label>
-                            <input type="text" class="form-control" id="direccion" name="direccion" 
-                                   value="<?= htmlspecialchars($empresa['Direccion'] ?? '') ?>">
-                        </div>
                     </div>
                     
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="telefono" class="form-label">Teléfono</label>
-                            <input type="tel" class="form-control" id="telefono" name="telefono" 
-                                   value="<?= htmlspecialchars($empresa['Telefono'] ?? '') ?>">
-                        </div>
-                        
                         <div class="mb-3">
                             <label for="email" class="form-label">Email de Contacto</label>
                             <input type="email" class="form-control" id="email" name="email" 
@@ -192,9 +197,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <div class="row mb-4">
                     <div class="col-md-12 text-center">
-                        <?php if (!empty($empresa['Logo'])): ?>
-                            <img src="data:<?= htmlspecialchars($empresa['TipoMimeLogo']) ?>;base64,<?= base64_encode($empresa['Logo']) ?>" 
-                                 class="logo-preview mb-3" id="logoPreview">
+                        <?php if ($logoExists): ?>
+                            <img src="<?= htmlspecialchars($logoUrl) ?>" class="logo-preview mb-3" id="logoPreview">
                         <?php else: ?>
                             <div class="logo-preview mb-3 d-flex align-items-center justify-content-center" id="logoPreview">
                                 <i class="fas fa-building text-muted" style="font-size: 3rem;"></i>
