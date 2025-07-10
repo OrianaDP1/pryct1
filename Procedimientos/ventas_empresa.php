@@ -36,6 +36,7 @@ function estadoEnvioTexto($estado) {
     switch ($estado) {
         case 1: return "Preparando";
         case 2: return "Enviando";
+        case 3: return "Entregado"; // Agregamos "Entregado" por si lo usas en el futuro
         default: return "Desconocido";
     }
 }
@@ -97,13 +98,13 @@ function estadoEnvioTexto($estado) {
                 </div>
                 <div class="card-body">
                   <h5 class="card-title"><?= $venta['nombre_producto'] ?></h5>
-                  <p><strong>Cliente:</strong> <?= $venta['Nombres'] . ' ' . $venta['Apellidos'] ?></p>
-                  <p><strong>Cantidad:</strong> <?= $venta['Cantidad'] ?></p>
+                  <p><strong>Cliente:</strong> <?= $venta['nombres'] . ' ' . $venta['Apellidos'] ?></p>
+                  <p><strong>Cantidad:</strong> <?= $venta['cantidad'] ?></p>
                   <p><strong>Precio Unitario:</strong> S/ <?= number_format($venta['Precio_Unitario'], 2) ?></p>
-                  <p><strong>Descuento:</strong> <?= $venta['Descuento'] ?>%</p>
-                  <p><strong>Fecha de Venta:</strong> <?= $venta['Fecha_Venta'] ?></p>
-                  <p><strong>Método de Pago:</strong> <?= $venta['Metodo_Pago'] ?></p>
-                  <p><strong>Estado de Envío:</strong> <?= estadoEnvioTexto($venta['Estado_de_Envio']) ?></p>
+                  <p><strong>Descuento:</strong> <?= $venta['descuento'] ?>%</p>
+                  <p><strong>Fecha de Venta:</strong> <?= $venta['fecha_Venta'] ?></p>
+                  <p><strong>Método de Pago:</strong> <?= $venta['metodo_Pago'] ?></p>
+                  <p><strong>Estado de Envío:</strong> <?= estadoEnvioTexto($venta['estado_de_Envio']) ?></p>
 
                   <!-- Botones de acción -->
                   <div class="mt-3 d-flex gap-2">
@@ -115,6 +116,8 @@ function estadoEnvioTexto($estado) {
                       <input type="hidden" name="id_venta" value="<?= $venta['idventa'] ?>">
                       <button type="submit" class="btn btn-danger btn-sm">Cancelar Venta</button>
                     </form>
+                    <!-- Nuevo botón de actualización de estado -->
+                    <a href="estado de venta.php?id_venta=<?= $venta['idventa'] ?>" class="btn btn-warning btn-sm">Actualizar Estado</a>
                   </div>
                 </div>
               </div>
