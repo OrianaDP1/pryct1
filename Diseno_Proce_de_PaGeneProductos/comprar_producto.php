@@ -26,6 +26,17 @@ $idcliente = $cliente ['idcliente'];
 $idproducto = filter_input(INPUT_POST, 'idproducto', FILTER_VALIDATE_INT);
 $cantidad = filter_input(INPUT_POST, 'cantidad', FILTER_VALIDATE_INT);
 
+if (isset($_SESSION['pago_autorizado'], $_SESSION['compra_pendiente']) && $_SESSION['pago_autorizado'] === true) {
+    $idproducto = $_SESSION['compra_pendiente']['idproducto'];
+    $cantidad = $_SESSION['compra_pendiente']['cantidad'];
+    // Limpiar flags antes de continuar
+    unset($_SESSION['pago_autorizado'], $_SESSION['compra_pendiente']);
+} else {
+    // Fallback al método tradicional vía POST (compra directa sin pago)
+    $idproducto = filter_input(INPUT_POST, 'idproducto', FILTER_VALIDATE_INT);
+    $cantidad = filter_input(INPUT_POST, 'cantidad', FILTER_VALIDATE_INT);
+}
+
 if (!$idproducto || !$cantidad || $cantidad < 1) {
     $_SESSION['error'] = "Datos inválidos para la compra.";
     header("Location: ../Diseño de las Interfaces/ModuloCliente.php");
@@ -63,12 +74,11 @@ try {
         ':precio_unit' => $producto['precio'],
         ':descuento' => 0,
         ':idproducto' => $idproducto,
-        ':idcliente' => $idcliente  // ✔️ Este es el correcto
+        ':idcliente' => $idcliente  
     ]);
     
     $idVenta = $con->lastInsertId();
 
-    // Insertar en Detalle_Ventas
     $stmtDetalle = $con->prepare("
         INSERT INTO Detalle_Ventas (Estado_Venta, Metodo_Pago, Estado_de_Envio, IDVenta)
         VALUES (:estado, :metodo, :envio, :idventa)

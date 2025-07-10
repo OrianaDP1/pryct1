@@ -79,26 +79,28 @@ $productosComprados = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <?php if (count($productosComprados) === 0): ?>
     <p>No has comprado productos aún.</p>
   <?php else: ?>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      <?php foreach ($productosComprados as $prod): ?>
-        <div class="col">
-          <div class="card h-100 shadow-sm">
+    <?php foreach ($productosComprados as $prod): ?>
+      <div class="card mb-4 shadow-sm">
+        <div class="row g-0">
+          <div class="col-md-3 d-flex align-items-center justify-content-center p-2">
             <img
               src="../Procedimientos/mostrar_imagen.php?idproducto=<?= (int)$prod['idproducto'] ?>"
               alt="<?= htmlspecialchars($prod['nombre']) ?>"
-              class="product-img card-img-top"
+              class="img-fluid rounded"
+              style="max-height: 150px; object-fit: contain;"
             />
+          </div>
+          <div class="col-md-9">
             <div class="card-body">
               <h5 class="card-title"><?= htmlspecialchars($prod['nombre']) ?></h5>
               <p class="card-text"><?= htmlspecialchars($prod['descripcion']) ?></p>
-              <ul class="list-unstyled">
+              <ul class="list-unstyled mb-0">
                 <li><strong>Cantidad:</strong> <?= $prod['cantidad'] ?></li>
                 <li><strong>Precio unitario:</strong> $<?= number_format($prod['precio_unitario'], 2) ?></li>
                 <li><strong>Fecha de compra:</strong> <?= date('d/m/Y H:i', strtotime($prod['fecha_venta'])) ?></li>
                 <li><strong>Método de pago:</strong> <?= htmlspecialchars($prod['metodo_pago']) ?></li>
                 <li><strong>Estado de envío:</strong>
                   <?php
-                    // Ejemplo de interpretación simple
                     switch ($prod['estado_de_envio']) {
                       case 1: echo "En proceso"; break;
                       case 2: echo "Enviado"; break;
@@ -107,14 +109,23 @@ $productosComprados = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     }
                   ?>
                 </li>
+                <li>
+                  <form action="eliminar_producto_comprado.php" method="POST" class="d-inline">
+                    <input type="hidden" name="idproducto" value="<?= (int)$prod['idproducto'] ?>">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar este producto de tu historial?')">
+                      Eliminar
+                    </button>
+                  </form>
+                </li>
               </ul>
             </div>
           </div>
         </div>
-      <?php endforeach; ?>
-    </div>
+      </div>
+    <?php endforeach; ?>
   <?php endif; ?>
 </main>
+
 
 <footer class="bg-light text-center py-3 mt-4">
   <p>&copy; 2025 Mi Empresa. Todos los derechos reservados.</p>
