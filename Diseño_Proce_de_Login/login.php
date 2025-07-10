@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../DB/conexion.php';
+include __DIR__ . '/../DB/conexion.php';
 
 if (isset($_SESSION['id_usuario']) && isset($_SESSION['tipo_usuario'])) {
     // Redirige según tipo de usuario
@@ -19,10 +19,15 @@ if (isset($_SESSION['id_usuario']) && isset($_SESSION['tipo_usuario'])) {
 // Leer JSON POST
 $data = json_decode(file_get_contents('php://input'), true);
 
+if (!$data || !isset($data['usuario']) || !isset($data['contrasena'])) {
+    echo json_encode(['success' => false, 'error' => 'Datos no válidos']);
+    exit;
+}
+
 header('Content-Type: application/json');
 
-$nombre_usuario = trim($data['usuario'] ?? '');
-$contrasena = trim($data['contrasena'] ?? '');
+$nombre_usuario = trim($data['usuario']);
+$contrasena = trim($data['contrasena']);
 
 if ($nombre_usuario === '' || $contrasena === '') {
     echo json_encode(['success' => false, 'error' => 'Usuario o contraseña vacíos']);
@@ -30,11 +35,11 @@ if ($nombre_usuario === '' || $contrasena === '') {
 }
 
 // Aquí debes poner hashing de contraseñas en producción!!! Esto es solo demo.
-$stmt = $con->prepare("SELECT idusuario, nombre, contrasena FROM usuario WHERE nombre = :nombre AND contrasena = :contrasena");
-$stmt->execute(['nombre' => $nombre_usuario, 'contrasena' => $contrasena]);
-$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt = $con->prepare("SELECT idusuario, nombre, contrasena FROM usuario WHERE nombre = :nombre");
+$stmt->execute(['nombre' => $nombre_usuario]);
+$usuario = $stmt->fetch();
 
-if (!$usuario) {
+if (!$usuario || !password_verify($contrasena, $usuario['contrasena'])) {
     echo json_encode(['success' => false, 'error' => 'Usuario o contraseña incorrectos']);
     exit;
 }
